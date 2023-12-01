@@ -11,6 +11,10 @@ import java.util.*;
 import static redes.raulcaio.calculator.NetworkAddressCalculator.calculateNetworkAddress;
 import static redes.raulcaio.calculator.NetworkAddressCalculator.calculateSubnetMask;
 
+// Redes de computadores 2023/2
+// Raul Souza
+// Caio Furlan
+
 public class Server {
 
     public static void main(String[] args) throws IOException {

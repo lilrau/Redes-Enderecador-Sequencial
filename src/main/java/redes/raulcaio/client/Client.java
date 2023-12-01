@@ -12,6 +12,10 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+// Redes de computadores 2023/2
+// Raul Souza
+// Caio Furlan
+
 public class Client {
 
     public static void main(String[] args) throws IOException {
