@@ -1,0 +1,19 @@
+Pedido do Cliente:
+{
+  "n_redes": "2",
+  "redes": {
+  "1": {
+      "maquinas": 200,
+    },
+  "2": {
+      "maquinas": 100,
+    }
+  }
+}
+
+
+Resposta do Servidor:
+{
+  "1": "192.168.0.0/24",
+  "2": "192.168.1.0/25"
+}
