@@ -18,6 +18,10 @@ import static redes.raulcaio.calculator.NetworkAddressCalculator.calculateSubnet
 public class Server {
 
     public static void main(String[] args) throws IOException {
+        Ansi_colors colors = new Ansi_colors();
+        System.out.println(colors.getColor("cyan") + "→ Raul Souza" + colors.getColor("default"));
+        System.out.println(colors.getColor("cyan") + "→ Caio Furlan" + colors.getColor("default"));
+        System.out.println();
 
         System.out.println("IP do servidor: " + InetAddress.getLocalHost().getHostAddress());
 
@@ -26,7 +30,6 @@ public class Server {
         System.out.println("\nPorta do servidor:");
         int serverPort = Integer.parseInt(stdIn.readLine());
         try {
-            Ansi_colors colors = new Ansi_colors();
             serverSocket = new ServerSocket(serverPort);
             System.out.println("Servidor esperando por conexões...");
 

@@ -19,6 +19,11 @@ import java.util.Map;
 public class Client {
 
     public static void main(String[] args) throws IOException {
+        Ansi_colors colors = new Ansi_colors();
+        System.out.println(colors.getColor("cyan") + "→ Raul Souza" + colors.getColor("default"));
+        System.out.println(colors.getColor("cyan") + "→ Caio Furlan" + colors.getColor("default"));
+        System.out.println();
+
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("IP do servidor:");
         String serverHostname = stdIn.readLine();
@@ -31,8 +36,6 @@ public class Client {
                     String jsonRequest = "";
                     PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
                     BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                    Ansi_colors colors = new Ansi_colors();
 
                     System.out.println("Digite a Quantidade de Redes:");
                     String qtdRedes = stdIn.readLine();
