@@ -88,6 +88,8 @@ public class Server {
             out.println(serverResponse);
             System.out.println(colors.getColor("green") + "→ Resposta enviada para o cliente: " + colors.getColor("default") + serverResponse);
 
+            System.out.println("----------------------------------------------------------------------------------------------------");
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

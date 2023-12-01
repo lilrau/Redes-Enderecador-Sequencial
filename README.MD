@@ -1,12 +1,9 @@
 
-# 📍 Endereçador Sequencial
+# 🎯 Endereçador Sequencial
 
 Projeto para a disciplina Redes de Computadores, cujo objetivo é determinar o endereço de rede sequencial conforme a quantidade de redes e máquinas.
 
 O cliente deve fornecer as seguintes informações: número de redes e a quantidade de máquinas de cada rede. O servidor recebe estas informações e calcula a máscara e o endereço de cada rede.
-
-
-
 
 ## 📝 Exemplo
 
