@@ -15,24 +15,33 @@ O cliente deve fornecer as seguintes informações: número de redes e a quantid
 ## 📨 Protocolo de Troca de Dados
 
 ```
-Pedido do Cliente:
-{
-  "n_redes": "2",
-  "redes": {
-  "1": {
-      "maquinas": 200,
-    },
-  "2": {
-      "maquinas": 100,
-    }
-  }
-}
 
+Solicitação do cliente: 
+{
+  "redes": [
+    {
+      "id": 1,
+      "maquinas": 200
+    },
+    {
+      "id":2,
+      "maquinas": 100
+    }
+  ]
+}
 
 Resposta do Servidor:
 {
-  "1": "192.168.0.0/24",
-  "2": "192.168.1.0/25"
+  "redes": [
+    {
+      "id":1,
+      "endereco":"192.168.0.0/24"
+    },
+    {
+      "id":2,
+      "endereco":"192.168.1.0/25"
+    }
+  ]
 }
 ```
 ## ⚙️ Dependências

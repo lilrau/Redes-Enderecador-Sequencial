@@ -2,6 +2,8 @@ package redes.raulcaio.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import redes.raulcaio.tools.Ansi_colors;
 
 import java.io.BufferedReader;
@@ -9,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 
 // Redes de computadores 2023/2
 // Raul Souza
@@ -33,7 +33,6 @@ public class Client {
         try {
             while (true) {
                 try (Socket socket = new Socket(serverHostname, serverPort)) {
-                    String jsonRequest = "";
                     PrintWriter outToServer = new PrintWriter(socket.getOutputStream(), true);
                     BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -42,23 +41,23 @@ public class Client {
 
                     // Criar o JSON
                     ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode jsonNode = objectMapper.createObjectNode();
 
-                    Map<String, Object> jsonMap = new HashMap<>();
-                    jsonMap.put("n_redes", qtdRedes);
-
-                    Map<String, Object> listaRedesMap = new HashMap<>();
+                    ArrayNode networkListNode = objectMapper.createArrayNode();
 
                     for (int i = 1; i <= Integer.parseInt(qtdRedes); i++) {
                         System.out.println("Digite a quantidade de máquinas da Rede" + colors.getColor("cyan") + " " + i + colors.getColor("default") + ":");
                         int qtdMaquinas = Integer.parseInt(stdIn.readLine());
 
-                        Map<String, Object> redeMap = new HashMap<>();
-                        redeMap.put("maquinas", qtdMaquinas);
-                        listaRedesMap.put(String.valueOf(i), redeMap);
+                        ObjectNode networkNode = objectMapper.createObjectNode();
+                        networkNode.put("id", i);
+                        networkNode.put("maquinas", qtdMaquinas);
+                        networkListNode.add(networkNode);
                     }
 
-                    jsonMap.put("redes", listaRedesMap);
-                    jsonRequest = objectMapper.writeValueAsString(jsonMap);
+                    String jsonRequest = "";
+                    ((ObjectNode) jsonNode).set("redes", networkListNode);
+                    jsonRequest = objectMapper.writeValueAsString(jsonNode);
 
                     // Enviar o JSON para o servidor
                     sendRequest(outToServer, jsonRequest);
@@ -70,18 +69,18 @@ public class Client {
 
                     // Mapear o JSON para um objeto Java
                     objectMapper = new ObjectMapper();
-                    JsonNode jsonNode = objectMapper.readTree(serverResponse);
+                    jsonNode = objectMapper.readTree(serverResponse);
+
+                    ArrayNode networkList = (ArrayNode) jsonNode.get("redes");
 
                     System.out.println("-----------------------------------------------------------------------------");
 
                     // Exibir os endereços das redes
-                    for (int i = 1; i <= jsonNode.size(); i++) {
-                        String rede = jsonNode.get(String.valueOf(i)).asText();
-                        System.out.println("Endereço da Rede " + colors.getColor("cyan") + i + colors.getColor("default") + ":");
-                        System.out.println("↳ " + rede);
-                        if (i < jsonNode.size()) {
-                            System.out.println();
-                        }
+                    for (JsonNode networkNode: networkList) {
+                        NetworkModel network = objectMapper.treeToValue(networkNode, NetworkModel.class);
+                        System.out.println("Endereço da Rede " + colors.getColor("cyan") + network.getId() + colors.getColor("default") + ":");
+                        System.out.println("↳ " + network.getEndereco());
+                        System.out.println();
                     }
 
                     System.out.println("-----------------------------------------------------------------------------");

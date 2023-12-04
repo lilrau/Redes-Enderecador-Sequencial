@@ -2,14 +2,21 @@ package redes.raulcaio.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import redes.raulcaio.tools.Ansi_colors;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
-import static redes.raulcaio.calculator.NetworkAddressCalculator.calculateNetworkAddress;
-import static redes.raulcaio.calculator.NetworkAddressCalculator.calculateSubnetMask;
+import static redes.raulcaio.server.NetworkAddressCalculator.calculateNetworkAddress;
+import static redes.raulcaio.server.NetworkAddressCalculator.calculateSubnetMask;
 
 // Redes de computadores 2023/2
 // Raul Souza
@@ -54,40 +61,45 @@ public class Server {
             Ansi_colors colors = new Ansi_colors();
             BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper();
 
             // Ler a solicitação do cliente
             String clientRequest = inFromClient.readLine();
-            JsonNode clientData = mapper.readTree(clientRequest);
+            JsonNode clientData = objectMapper.readTree(clientRequest);
 
             // Imprimir a solicitação do cliente
             System.out.println(colors.getColor("yellow") + "→ Solicitação do cliente: " + colors.getColor("default") + clientData);
 
             // Obter o número de redes e a quantidade de máquinas de cada rede
-            int n_redes = clientData.get("n_redes").asInt();
             JsonNode redes = clientData.get("redes");
+            int n_redes = redes.size();
 
-
-            Map<String, String> resposta = new HashMap<>();
+            ObjectNode response = objectMapper.createObjectNode();
 
             // Calcular a máscara e o endereço de rede para cada rede
             int currentNetworkIndex = 0;
-            for (int i = 1; i <= n_redes; i++) {
-                int maquinas = redes.get(String.valueOf(i)).get("maquinas").asInt();
-
+            // Criando e organizando a lista de redes em ordem decrescente de quantidade de máquinas
+            List<NetworkModel> networkList = new ArrayList<>();
+            for (JsonNode rede : redes) {
+                networkList.add(objectMapper.convertValue(rede, NetworkModel.class));
+            }
+            networkList.sort((a, b) -> b.getMaquinas() - a.getMaquinas());
+            for (NetworkModel network : networkList) {
                 String networkAddress = calculateNetworkAddress("192.168.0.0", currentNetworkIndex);
-                int subnetMask = calculateSubnetMask(maquinas);
+                int subnetMask = calculateSubnetMask(network.getMaquinas());
 
-                String enderecoRede = networkAddress + "/" + subnetMask;
-                System.out.println("Network " + i + ": " + enderecoRede);
-                resposta.put(String.valueOf(i), enderecoRede);
+                networkAddress = networkAddress + "/" + subnetMask;
+                network.setEndereco(networkAddress);
 
                 // Move o index atual para o proximo endereço de rede disponível
                 currentNetworkIndex += 1 << (32 - subnetMask);
             }
+            // Voltando a lista para a ordem original
+            networkList.sort((a, b) -> a.getId() - b.getId());
 
             // Enviar a resposta para o cliente
-            String serverResponse = mapper.writeValueAsString(resposta);
+            response.set("redes", objectMapper.valueToTree(networkList));
+            String serverResponse = objectMapper.writeValueAsString(response);
             out.println(serverResponse);
             System.out.println(colors.getColor("green") + "→ Resposta enviada para o cliente: " + colors.getColor("default") + serverResponse);
 
